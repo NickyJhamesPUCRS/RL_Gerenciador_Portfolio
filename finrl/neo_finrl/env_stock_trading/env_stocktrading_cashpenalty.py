@@ -10,7 +10,7 @@ from gym import spaces
 from stable_baselines3.common import logger
 from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv
 
-matplotlib.use("Agg")
+# matplotlib.use("Agg")
 
 
 class StockTradingEnvCashpenalty(gym.Env):

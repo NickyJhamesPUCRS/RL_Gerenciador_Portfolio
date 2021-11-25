@@ -26,5 +26,5 @@ def backtest_plot(baseline_dataframe, DRL_strat):
 
     with pyfolio.plotting.plotting_context(context='paper', font_scale=1.1):
         return baseline_returns, pyfolio.create_full_tear_sheet(returns=DRL_strat,
-                                       benchmark_rets=baseline_returns, set_context=False, )
+                                       benchmark_rets=baseline_returns, set_context=False)
 
