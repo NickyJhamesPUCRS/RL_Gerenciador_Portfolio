@@ -1,4 +1,4 @@
-def plot_drl_min_var_DJIA(dataframe_daily_return, cumpod, dji_cumpod, min_var_cumpod):
+def plot_drl_min_var_baseline(log_name, dataframe_daily_return, cumpod, baseline_cumpod, min_var_cumpod):
     import plotly.graph_objs as go
     import pandas as pd
 
@@ -41,8 +41,8 @@ def plot_drl_min_var_DJIA(dataframe_daily_return, cumpod, dji_cumpod, min_var_cu
         fig.show()
 
     time_ind = pd.Series(dataframe_daily_return.date)
-    trace0_portfolio = go.Scatter(x=time_ind, y=cumpod, mode='lines', name='A2C (Portfolio Allocation)')
-    trace1_portfolio = go.Scatter(x=time_ind, y=dji_cumpod, mode='lines', name='DJIA')
+    trace0_portfolio = go.Scatter(x=time_ind, y=cumpod, mode='lines', name=log_name+' (Portfolio Allocation)')
+    trace1_portfolio = go.Scatter(x=time_ind, y=baseline_cumpod, mode='lines', name='Baseline')
     trace2_portfolio = go.Scatter(x=time_ind, y=min_var_cumpod, mode='lines', name='Min-Variance')
 
     traces = [trace0_portfolio, trace1_portfolio, trace2_portfolio]

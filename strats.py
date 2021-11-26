@@ -8,7 +8,7 @@ def backtest_stats(dataframe_daily_return):
                                positions=None, transactions=None, turnover_denom="AGB")
 
 
-def baseline_strats(dataframe_daily_return, ref_ticker="BOVA11.SA"):
+def baseline_stats(dataframe_daily_return, ref_ticker="BOVA11.SA"):
     from finrl.plot import get_baseline, backtest_stats
     baseline_dataframe = get_baseline(
         ticker=ref_ticker,
