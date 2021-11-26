@@ -15,16 +15,21 @@ def baseline_stats(dataframe_daily_return, ref_ticker="BOVA11.SA"):
         start=dataframe_daily_return.loc[0, 'date'],
         end=dataframe_daily_return.loc[len(dataframe_daily_return) - 1, 'date'])
 
-    return baseline_dataframe, backtest_stats(baseline_dataframe, value_col_name='close')
+    return backtest_stats(baseline_dataframe, value_col_name='close')
 
 
-def backtest_plot(baseline_dataframe, DRL_strat):
+def backtest_plot(dataframe_daily_return, DRL_strat):
     import pyfolio
-    from finrl.plot import get_daily_return
+    from finrl.plot import get_daily_return, get_baseline
 
-    baseline_returns = get_daily_return(baseline_dataframe, value_col_name="close")
+    baseline_df = get_baseline(
+        ticker='BOVA11.SA', start=dataframe_daily_return.loc[0, 'date'],
+        end=dataframe_daily_return.loc[len(dataframe_daily_return) - 1, 'date']
+    )
 
-    with pyfolio.plotting.plotting_context(context='paper', font_scale=1.1):
+    baseline_returns = get_daily_return(baseline_df, value_col_name="close")
+
+    with pyfolio.plotting.plotting_context(font_scale=1.1):
         return baseline_returns, pyfolio.create_full_tear_sheet(returns=DRL_strat,
                                        benchmark_rets=baseline_returns, set_context=False)
 

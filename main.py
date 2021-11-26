@@ -109,14 +109,14 @@ if __name__ == '__main__':
     DRL_strat, perf_stats_all = strats.backtest_stats(dataframe_daily_return)
     print("==============DRL Strategy Stats===========")
     print(perf_stats_all)
-    baseline_dataframe, stats = strats.baseline_stats(dataframe_daily_return)
+    stats = strats.baseline_stats(dataframe_daily_return)
     print("==============Get Baseline Stats===========")
     print(stats)
-    baseline_returns, tear_sheet = strats.backtest_plot(baseline_dataframe, DRL_strat)
+    baseline_returns, tear_sheet = strats.backtest_plot(dataframe_daily_return, DRL_strat)
 
     portfolio = utils.port_min_variance(dataframe, dataframe_test)
     cumpod = (dataframe_daily_return.daily_return + 1).cumprod() - 1
     min_var_cumpod = (portfolio.account_value.pct_change() + 1).cumprod() - 1
     baseline_cumpod = (baseline_returns + 1).cumprod() - 1
 
-    plots.plot_drl_min_var_baseline(config.CHOOSED_MODEL['log_name'], dataframe_daily_return, cumpod, baseline_cumpod, min_var_cumpod)
+    plots.plot_drl_min_var_baseline(config, dataframe_daily_return, cumpod, baseline_cumpod, min_var_cumpod)
