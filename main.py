@@ -63,60 +63,73 @@ def data_split(dataframe, train_start_date, train_end_date, test_start_date, tes
 if __name__ == '__main__':
     from finrl.apps import config
     from environment import StockPortfolioEnv
-    import DRL, strats, utils, plots
+    import DRL, strats, utils, plots, tb_server
 
     create_folders(config)
-    dataframe = download_data(start_date=config.START_DATE, end_date=config.END_DATE, ticker_list=config.B3_TICKER)
-    dataframe = add_technical_indicators(dataframe)
-    dataframe = add_covariance_matrix(dataframe)
 
-    dataframe_train, dataframe_test = data_split(dataframe,
-                                                 train_start_date=config.TRAIN_START_DATE,
-                                                 train_end_date=config.TRAIN_END_DATE,
-                                                 test_start_date=config.TEST_START_DATE,
-                                                 test_end_date=config.TEST_END_DATE)
+    p = tb_server.run_tensorboard_server(config)
 
-    stock_dimension = len(dataframe_train.tic.unique())
-    state_space = stock_dimension
-    print(f"Stock Dimension: {stock_dimension}, State Space: {state_space}")
+    try:
+        dataframe = download_data(start_date=config.START_DATE, end_date=config.END_DATE, ticker_list=config.B3_TICKER)
+        dataframe = add_technical_indicators(dataframe)
+        dataframe = add_covariance_matrix(dataframe)
 
-    env_kwargs = {
-        "hmax": 100,
-        "initial_amount": 1000000,
-        "transaction_cost_pct": 0.001,
-        "state_space": state_space,
-        "stock_dim": stock_dimension,
-        "tech_indicator_list": config.TECHNICAL_INDICATORS_LIST,
-        "action_space": stock_dimension,
-        "reward_scaling": 1e-4
-    }
+        dataframe_train, dataframe_test = data_split(dataframe,
+                                                     train_start_date=config.TRAIN_START_DATE,
+                                                     train_end_date=config.TRAIN_END_DATE,
+                                                     test_start_date=config.TEST_START_DATE,
+                                                     test_end_date=config.TEST_END_DATE)
 
-    e_train_gym = StockPortfolioEnv(df=dataframe_train, **env_kwargs)
-    e_trade_gym = StockPortfolioEnv(df=dataframe_test, **env_kwargs)
+        stock_dimension = len(dataframe_train.tic.unique())
+        state_space = stock_dimension
+        print(f"Stock Dimension: {stock_dimension}, State Space: {state_space}")
 
-    env_train, _ = e_train_gym.get_sb_env()
+        env_kwargs = {
+            "hmax": 100,
+            "initial_amount": 1000000,
+            "transaction_cost_pct": 0.001,
+            "state_space": state_space,
+            "stock_dim": stock_dimension,
+            "tech_indicator_list": config.TECHNICAL_INDICATORS_LIST,
+            "action_space": stock_dimension,
+            "reward_scaling": 1e-4
+        }
 
-    agent, model = DRL.create_drl_agent_model(env_train, config)
-    trained_agent = DRL.train_model(agent, model, config)
-    trained_agent.save(config.TRAINED_MODEL_DIR + "/trained_{}.zip".format(config.CHOOSED_MODEL['log_name']))
+        e_train_gym = StockPortfolioEnv(df=dataframe_train, **env_kwargs)
+        e_trade_gym = StockPortfolioEnv(df=dataframe_test, **env_kwargs)
 
-    dataframe_daily_return, dataframe_actions = DRL.prediction(model, e_trade_gym)
-    dataframe_daily_return.to_excel(
-        config.RESULTS_DIR + "/df_daily_return_{}.xlsx".format(config.CHOOSED_MODEL['log_name']))
-    dataframe_actions.to_excel(
-        config.RESULTS_DIR + "/df_actions_{}.xlsx".format(config.CHOOSED_MODEL['log_name']))
+        env_train, _ = e_train_gym.get_sb_env()
 
-    DRL_strat, perf_stats_all = strats.backtest_stats(dataframe_daily_return)
-    print("==============DRL Strategy Stats===========")
-    print(perf_stats_all)
-    stats = strats.baseline_stats(dataframe_daily_return)
-    print("==============Get Baseline Stats===========")
-    print(stats)
-    baseline_returns, tear_sheet = strats.backtest_plot(dataframe_daily_return, DRL_strat)
+        agent, model = DRL.create_drl_agent_model(env_train, config)
+        trained_agent = DRL.train_model(agent, model, config)
+        trained_agent.save(config.TRAINED_MODEL_DIR + "/trained_{}.zip".format(config.CHOOSED_MODEL['log_name']))
 
-    portfolio = utils.port_min_variance(dataframe, dataframe_test)
-    cumpod = (dataframe_daily_return.daily_return + 1).cumprod() - 1
-    min_var_cumpod = (portfolio.account_value.pct_change() + 1).cumprod() - 1
-    baseline_cumpod = (baseline_returns + 1).cumprod() - 1
+        dataframe_daily_return, dataframe_actions = DRL.prediction(model, e_trade_gym)
+        dataframe_daily_return.to_excel(
+            config.RESULTS_DIR + "/df_daily_return_{}.xlsx".format(config.CHOOSED_MODEL['log_name']))
+        dataframe_actions.to_excel(
+            config.RESULTS_DIR + "/df_actions_{}.xlsx".format(config.CHOOSED_MODEL['log_name']))
 
-    plots.plot_drl_min_var_baseline(config, dataframe_daily_return, cumpod, baseline_cumpod, min_var_cumpod)
+        DRL_strat, perf_stats_all = strats.backtest_stats(dataframe_daily_return)
+        print("==============DRL Strategy Stats===========")
+        print(perf_stats_all)
+        stats = strats.baseline_stats(dataframe_daily_return)
+        print("==============Get Baseline Stats===========")
+        print(stats)
+        baseline_returns, tear_sheet = strats.backtest_plot(dataframe_daily_return, DRL_strat)
+
+        portfolio = utils.port_min_variance(dataframe, dataframe_test)
+        cumpod = (dataframe_daily_return.daily_return + 1).cumprod() - 1
+        min_var_cumpod = (portfolio.account_value.pct_change() + 1).cumprod() - 1
+        baseline_cumpod = (baseline_returns + 1).cumprod() - 1
+
+        plots.plot_drl_min_var_baseline(config, dataframe_daily_return, cumpod, baseline_cumpod, min_var_cumpod)
+
+        p.wait()
+
+    except KeyboardInterrupt:
+        try:
+            p.terminate()
+        except OSError:
+            pass
+        p.wait()

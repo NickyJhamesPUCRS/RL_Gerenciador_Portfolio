@@ -1,7 +1,7 @@
 from finrl.drl_agents.stablebaselines3.models import DRLAgent
 
-def create_drl_agent_model(environment, config):
 
+def create_drl_agent_model(environment, config):
     agent = DRLAgent(env=environment)
 
     return agent, agent.get_model(model_name=config.CHOOSED_MODEL['log_name'], model_kwargs=config.CHOOSED_MODEL['model_kwargs'])
