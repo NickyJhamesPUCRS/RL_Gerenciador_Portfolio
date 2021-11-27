@@ -42,6 +42,9 @@ def plot_drl_min_var_baseline(config, dataframe_daily_return, cumpod, baseline_c
         #fig.show()
 
     time_ind = pd.Series(dataframe_daily_return.date)
+    print(cumpod)
+    print("==============================")
+    print(baseline_cumpod)
     trace0_portfolio = go.Scatter(x=time_ind, y=cumpod, mode='lines', name=config.CHOOSED_MODEL['log_name']+' (Portfolio Allocation)')
     trace1_portfolio = go.Scatter(x=time_ind, y=baseline_cumpod, mode='lines', name='Baseline')
     trace2_portfolio = go.Scatter(x=time_ind, y=min_var_cumpod, mode='lines', name='Min-Variance')
