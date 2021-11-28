@@ -63,7 +63,8 @@ def data_split(dataframe, train_start_date, train_end_date, test_start_date, tes
 if __name__ == '__main__':
     from finrl.apps import config
     from environment import StockPortfolioEnv
-    import DRL, strats, utils, plots, tb_server
+    import strats, utils, plots, tb_server
+    from drl import DRL
 
     create_folders(config)
 
@@ -100,31 +101,33 @@ if __name__ == '__main__':
 
         env_train, _ = e_train_gym.get_sb_env()
 
-        agent, model = DRL.create_drl_agent_model(env_train, config)
-        trained_agent = DRL.train_model(agent, model, config)
-        trained_agent.save(config.TRAINED_MODEL_DIR + "/trained_{}.zip".format(config.CHOOSED_MODEL['log_name']))
+        trained_agent = DRL.PPO_agent(env_train, config)
 
-        dataframe_daily_return, dataframe_actions = DRL.prediction(model, e_trade_gym)
-        dataframe_daily_return.to_excel(
-            config.RESULTS_DIR + "/df_daily_return_{}.xlsx".format(config.CHOOSED_MODEL['log_name']))
-        dataframe_actions.to_excel(
-            config.RESULTS_DIR + "/df_actions_{}.xlsx".format(config.CHOOSED_MODEL['log_name']))
-
-        DRL_strat, perf_stats_all = strats.backtest_stats(dataframe_daily_return)
-        print("==============DRL Strategy Stats===========")
-        print(perf_stats_all)
-        stats = strats.baseline_stats(dataframe_daily_return)
-        print("==============Get Baseline Stats===========")
-        print(stats)
-        baseline_returns, tear_sheet = strats.backtest_plot(dataframe_daily_return, DRL_strat)
-
-        portfolio = utils.port_min_variance(dataframe, dataframe_test)
-        cumpod = (dataframe_daily_return.daily_return + 1).cumprod() - 1
-        min_var_cumpod = (portfolio.account_value.pct_change() + 1).cumprod() - 1
-        baseline_cumpod = (baseline_returns + 1).cumprod() - 1
-
-        plots.plot_drl_min_var_baseline(config, dataframe_daily_return, cumpod, baseline_cumpod, min_var_cumpod)
-
+    #     agent, model = DRL.create_drl_agent_model(env_train, config)
+    #     trained_agent = DRL.train_model(agent, model, config)
+    #     trained_agent.save(config.TRAINED_MODEL_DIR + "/trained_{}.zip".format(config.CHOOSED_MODEL['log_name']))
+    #
+        dataframe_daily_return, dataframe_actions = DRL.prediction(trained_agent, e_trade_gym)
+    #     dataframe_daily_return.to_excel(
+    #         config.RESULTS_DIR + "/df_daily_return_{}.xlsx".format(config.CHOOSED_MODEL['log_name']))
+    #     dataframe_actions.to_excel(
+    #         config.RESULTS_DIR + "/df_actions_{}.xlsx".format(config.CHOOSED_MODEL['log_name']))
+    #
+    #     DRL_strat, perf_stats_all = strats.backtest_stats(dataframe_daily_return)
+    #     print("==============DRL Strategy Stats===========")
+    #     print(perf_stats_all)
+    #     stats = strats.baseline_stats(dataframe_daily_return)
+    #     print("==============Get Baseline Stats===========")
+    #     print(stats)
+    #     baseline_returns, tear_sheet = strats.backtest_plot(dataframe_daily_return, DRL_strat)
+    #
+    #     portfolio = utils.port_min_variance(dataframe, dataframe_test)
+    #     cumpod = (dataframe_daily_return.daily_return + 1).cumprod() - 1
+    #     min_var_cumpod = (portfolio.account_value.pct_change() + 1).cumprod() - 1
+    #     baseline_cumpod = (baseline_returns + 1).cumprod() - 1
+    #
+    #     plots.plot_drl_min_var_baseline(config, dataframe_daily_return, cumpod, baseline_cumpod, min_var_cumpod)
+    #
         p.wait()
 
     except KeyboardInterrupt:
