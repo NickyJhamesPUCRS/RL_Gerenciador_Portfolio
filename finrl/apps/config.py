@@ -81,9 +81,12 @@ RLlib_PARAMS = {
 '''
 ########################### CHOOSED MODEL #############################
 '''
+#
+# CHOOSED_MODEL = {'log_name': 'ppo',
+#                  'total_timesteps': 80000,
+#                  'model_kwargs': PPO_PARAMS}
 
-CHOOSED_MODEL = {'log_name': 'ppo',
-                 'total_timesteps': 80000,
+CHOOSED_MODEL = {'total_timesteps': 100000,
                  'model_kwargs': PPO_PARAMS}
 
 '''
