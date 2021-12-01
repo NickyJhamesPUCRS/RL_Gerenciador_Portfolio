@@ -1,6 +1,7 @@
-def plot_drl_min_var_baseline(config, dataframe_daily_return, cumpod, baseline_cumpod, min_var_cumpod):
+def plot_drl_min_var_baseline(dataframe_daily_return, cumpod, baseline_cumpod, min_var_cumpod):
     import plotly.graph_objs as go
     import pandas as pd
+    from parameters import RESULTS_DIR
 
     def PlotFigure(traces):
         fig = go.Figure()
@@ -38,14 +39,14 @@ def plot_drl_min_var_baseline(config, dataframe_daily_return, cumpod, baseline_c
                          mirror=True)
         fig.update_yaxes(zeroline=True, zerolinewidth=1, zerolinecolor='LightSteelBlue')
 
-        fig.write_image(config.RESULTS_DIR+'/drl_min_var_baseline_200ksteps.png')
+        fig.write_image(RESULTS_DIR+'/drl_min_var_baseline_200ksteps.png')
         #fig.show()
 
     time_ind = pd.Series(dataframe_daily_return.date)
     print(cumpod)
     print("==============================")
     print(baseline_cumpod)
-    trace0_portfolio = go.Scatter(x=time_ind, y=cumpod, mode='lines', name=config.CHOOSED_MODEL['log_name']+' (Portfolio Allocation)')
+    trace0_portfolio = go.Scatter(x=time_ind, y=cumpod, mode='lines', name='PPO (Portfolio Allocation)')
     trace1_portfolio = go.Scatter(x=time_ind, y=baseline_cumpod, mode='lines', name='Baseline')
     trace2_portfolio = go.Scatter(x=time_ind, y=min_var_cumpod, mode='lines', name='Min-Variance')
 

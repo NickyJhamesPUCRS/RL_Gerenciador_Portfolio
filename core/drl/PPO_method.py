@@ -1,6 +1,6 @@
-import warnings
-from typing import Any, Dict, Optional, Type, Union
+# DRL models from Stable Baselines 3
 
+from typing import Any, Dict, Optional, Type, Union
 import numpy as np
 import torch as th
 from gym import spaces
@@ -8,39 +8,37 @@ from torch.nn import functional as F
 
 from stable_baselines3.common.on_policy_algorithm import OnPolicyAlgorithm
 from stable_baselines3.common.policies import ActorCriticPolicy
-from stable_baselines3.common.type_aliases import GymEnv, MaybeCallback, Schedule
+from stable_baselines3.common.type_aliases import GymEnv, Schedule
 from stable_baselines3.common.utils import explained_variance, get_schedule_fn
 
 
-class PPO_policy(OnPolicyAlgorithm):
-    def __init__(
-        self,
-        policy: Union[str, Type[ActorCriticPolicy]],
-        env: Union[GymEnv, str],
-        learning_rate: Union[float, Schedule] = 3e-4,
-        n_steps: int = 2048,
-        batch_size: int = 64,
-        n_epochs: int = 10,
-        gamma: float = 0.99,
-        gae_lambda: float = 0.95,
-        clip_range: Union[float, Schedule] = 0.2,
-        clip_range_vf: Union[None, float, Schedule] = None,
-        ent_coef: float = 0.0,
-        vf_coef: float = 0.5,
-        max_grad_norm: float = 0.5,
-        use_sde: bool = False,
-        sde_sample_freq: int = -1,
-        target_kl: Optional[float] = None,
-        tensorboard_log: Optional[str] = None,
-        create_eval_env: bool = False,
-        policy_kwargs: Optional[Dict[str, Any]] = None,
-        verbose: int = 0,
-        seed: Optional[int] = None,
-        device: Union[th.device, str] = "auto",
-        _init_setup_model: bool = True,
-    ):
+class PPOLearner(OnPolicyAlgorithm):
+    def __init__(self,
+                 policy: Union[str, Type[ActorCriticPolicy]],
+                 env: Union[GymEnv, str],
+                 learning_rate: Union[float, Schedule] = 3e-4,
+                 n_steps: int = 2048,
+                 batch_size: int = 64,
+                 n_epochs: int = 10,
+                 gamma: float = 0.99,
+                 gae_lambda: float = 0.95,
+                 clip_range: Union[float, Schedule] = 0.2,
+                 clip_range_vf: Union[None, float, Schedule] = None,
+                 ent_coef: float = 0.0,
+                 vf_coef: float = 0.5,
+                 max_grad_norm: float = 0.5,
+                 use_sde: bool = False,
+                 sde_sample_freq: int = -1,
+                 target_kl: Optional[float] = None,
+                 tensorboard_log: Optional[str] = None,
+                 create_eval_env: bool = False,
+                 policy_kwargs: Optional[Dict[str, Any]] = None,
+                 verbose: int = 0,
+                 seed: Optional[int] = None,
+                 device: Union[th.device, str] = "auto",
+                 _init_setup_model: bool = True):
 
-        super(PPO_policy, self).__init__(
+        super(PPOLearner, self).__init__(
             policy,
             env,
             learning_rate=learning_rate,
@@ -64,33 +62,16 @@ class PPO_policy(OnPolicyAlgorithm):
                 spaces.Discrete,
                 spaces.MultiDiscrete,
                 spaces.MultiBinary,
-            ),
-        )
+            ))
 
-        # Sanity check, otherwise it will lead to noisy gradient and NaN
-        # because of the advantage normalization
-        assert (
-            batch_size > 1
-        ), "`batch_size` must be greater than 1. See https://github.com/DLR-RM/stable-baselines3/issues/440"
+        # hyperparameters
+        self.env = env
 
-        if self.env is not None:
-            # Check that `n_steps * n_envs > 1` to avoid NaN
-            # when doing advantage normalization
-            buffer_size = self.env.num_envs * self.n_steps
-            assert (
-                buffer_size > 1
-            ), f"`n_steps * n_envs` must be greater than 1. Currently n_steps={self.n_steps} and n_envs={self.env.num_envs}"
-            # Check that the rollout buffer size is a multiple of the mini-batch size
-            untruncated_batches = buffer_size // batch_size
-            if buffer_size % batch_size > 0:
-                warnings.warn(
-                    f"You have specified a mini-batch size of {batch_size},"
-                    f" but because the `RolloutBuffer` is of size `n_steps * n_envs = {buffer_size}`,"
-                    f" after every {untruncated_batches} untruncated mini-batches,"
-                    f" there will be a truncated mini-batch of size {buffer_size % batch_size}\n"
-                    f"We recommend using a `batch_size` that is a factor of `n_steps * n_envs`.\n"
-                    f"Info: (n_steps={self.n_steps} and n_envs={self.env.num_envs})"
-                )
+        self.policy = Union[policy, Type[ActorCriticPolicy]]
+        self.learning_rate = learning_rate
+        self.ent_coef = ent_coef
+        self.tensorboard_log = tensorboard_log
+
         self.batch_size = batch_size
         self.n_epochs = n_epochs
         self.clip_range = clip_range
@@ -101,7 +82,7 @@ class PPO_policy(OnPolicyAlgorithm):
             self._setup_model()
 
     def _setup_model(self) -> None:
-        super(PPO_policy, self)._setup_model()
+        super(PPOLearner, self)._setup_model()
 
         # Initialize schedules for policy/value clipping
         self.clip_range = get_schedule_fn(self.clip_range)
@@ -113,8 +94,8 @@ class PPO_policy(OnPolicyAlgorithm):
 
     def train(self) -> None:
         """
-        Update policy using the currently gathered rollout buffer.
-        """
+                Update policy using the currently gathered rollout buffer.
+                """
         # Switch to train mode (this affects batch norm / dropout)
         self.policy.set_training_mode(True)
         # Update optimizer learning rate
@@ -133,6 +114,9 @@ class PPO_policy(OnPolicyAlgorithm):
 
         # train for n_epochs epochs
         for epoch in range(self.n_epochs):
+
+            ## PPO code below
+
             approx_kl_divs = []
             # Do a complete pass on the rollout buffer
             for rollout_data in self.rollout_buffer.get(self.batch_size):
@@ -231,3 +215,22 @@ class PPO_policy(OnPolicyAlgorithm):
         self.logger.record("train/clip_range", clip_range)
         if self.clip_range_vf is not None:
             self.logger.record("train/clip_range_vf", clip_range_vf)
+
+    def prediction(self, environment):
+        test_env, test_obs = environment.get_sb_env()
+        """make a prediction"""
+        account_memory = []
+        actions_memory = []
+        test_env.reset()
+        for i in range(len(environment.df.index.unique())):
+            action, _states = self.predict(test_obs)
+            # account_memory = test_env.env_method(method_name="save_asset_memory")
+            # actions_memory = test_env.env_method(method_name="save_action_memory")
+            test_obs, rewards, dones, info = test_env.step(action)
+            if i == (len(environment.df.index.unique()) - 2):
+                account_memory = test_env.env_method(method_name="save_asset_memory")
+                actions_memory = test_env.env_method(method_name="save_action_memory")
+            if dones[0]:
+                print("hit end!")
+                break
+        return account_memory[0], actions_memory[0]
