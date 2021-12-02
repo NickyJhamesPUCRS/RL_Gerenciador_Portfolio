@@ -38,9 +38,9 @@ def plot_drl_min_var_baseline(dataframe_daily_return, cumpod, baseline_cumpod, m
         fig.update_yaxes(showline=True, linecolor='black', showgrid=True, gridwidth=1, gridcolor='LightSteelBlue',
                          mirror=True)
         fig.update_yaxes(zeroline=True, zerolinewidth=1, zerolinecolor='LightSteelBlue')
+        fig.show()
 
         fig.write_image(RESULTS_DIR+'/drl_min_var_baseline_200ksteps.png')
-        #fig.show()
 
     time_ind = pd.Series(dataframe_daily_return.date)
     print(cumpod)
