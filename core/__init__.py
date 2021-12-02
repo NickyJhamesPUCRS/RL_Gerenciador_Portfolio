@@ -49,3 +49,9 @@ def get_baseline_stats(dataframe_daily_return):
 def plot_backtest(dataframe_daily_return, DRL_strat):
     from .data_processing import backtest_plot
     return backtest_plot(dataframe_daily_return, DRL_strat, parameters.REF_TICKER)
+
+
+def append_date_df(dataframe):
+    from .data_processing import append_date_pddf
+    return append_date_pddf(dataframe, parameters.TEST_START_DATE, parameters.TEST_END_DATE)
+

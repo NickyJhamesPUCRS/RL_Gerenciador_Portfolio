@@ -36,5 +36,16 @@ def prediction(agent, environment):
     return agent.prediction(environment=environment)
 
 
-def dataframe2excel(dataframe, filename):
-    dataframe.to_excel(parameters.RESULTS_DIR + filename)
+def dataframe2excel(dataframe, filename, date=None):
+    if None == date:
+        dataframe.to_excel(parameters.RESULTS_DIR + filename)
+    elif date == "test":
+        _date = parameters.NOW.strftime("%d_%b_%Y_%H_%M_%S")
+        dataframe.to_excel(parameters.RESULTS_DIR +
+                           filename.format(parameters.TEST_START_DATE, parameters.TEST_END_DATE, _date))
+    elif date == "train":
+        _date = parameters.NOW.strftime("%d_%b_%Y_%H_%M_%S")
+        dataframe.to_excel(parameters.RESULTS_DIR +
+                           filename.format(parameters.TRAIN_START_DATE, parameters.TRAIN_END_DATE, _date))
+
+

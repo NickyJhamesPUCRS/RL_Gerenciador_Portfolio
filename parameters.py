@@ -119,7 +119,7 @@ B3_TICKER = [
     "EQTL3.SA",
     "GGBR4.SA",
     "SANB11.SA",
-    "WEGE3.SA"
+    "WEGE3.SA",
     "IVVB11.SA"
 ]
 

@@ -248,3 +248,18 @@ def backtest_plot(dataframe_daily_return, DRL_strat, ref_ticker):
         return baseline_returns, pyfolio.create_full_tear_sheet(returns=DRL_strat,
                                                                 benchmark_rets=baseline_returns, set_context=False)
 
+
+def append_date_pddf(dataframe, start_date, end_date):
+    import pandas as pd
+
+    pd_date = pd.Series()
+    pd_date['Teste Start Date'] = start_date
+    pd_date['Teste End Date'] = end_date
+
+    return pd.concat([dataframe, pd_date], axis=0)
+
+
+def merge_df(df_list, axis):
+    import pandas as pd
+
+    return pd.concat(df_list, axis=axis)
