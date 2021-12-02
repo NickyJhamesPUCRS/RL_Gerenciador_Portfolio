@@ -1,7 +1,7 @@
 if __name__ == '__main__':
     '''Stock trading environment class with OpenAI gym'''
     from core.drl.environment import StockPortfolioEnv
-    from core.drl import PPO_agent, generate_env_args, train_agent, prediction, dataframe2excel
+    from core.drl import generate_env_args, prediction, dataframe2excel, create_agent_and_train
 
     from core import download_data, add_technical_indicators, add_covariance_matrix, split_train_test, \
         create_folders, run_process_tensorboard, get_baseline_stats, plot_backtest, append_date_df
@@ -26,8 +26,7 @@ if __name__ == '__main__':
 
         env_train, _ = e_train_gym.get_sb_env()
 
-        agent = PPO_agent(env_train)
-        trained_agent = train_agent(agent)
+        trained_agent = create_agent_and_train(env_train, e_trade_gym)
 
         dataframe_daily_return, dataframe_actions = prediction(trained_agent, e_trade_gym)
 

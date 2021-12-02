@@ -33,10 +33,25 @@ class PPOLearner(OnPolicyAlgorithm):
                  tensorboard_log: Optional[str] = None,
                  create_eval_env: bool = False,
                  policy_kwargs: Optional[Dict[str, Any]] = None,
+                 net_arch: Optional[str] = None,
+                 activation_fn: Optional[str] = None,
+                 ortho_init: Optional[str] = None,
                  verbose: int = 0,
                  seed: Optional[int] = None,
                  device: Union[th.device, str] = "auto",
                  _init_setup_model: bool = True):
+
+        if policy_kwargs is None:
+            policy_kwargs = {}
+        if net_arch is not None:
+            policy_kwargs['net_arch'] = net_arch
+        if activation_fn is not None:
+            policy_kwargs['activation_fn'] = activation_fn
+        if ortho_init is not None:
+            policy_kwargs['ortho_init'] = ortho_init
+
+        if policy_kwargs == {}:
+            policy_kwargs = None
 
         super(PPOLearner, self).__init__(
             policy,

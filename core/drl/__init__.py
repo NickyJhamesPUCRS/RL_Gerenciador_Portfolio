@@ -10,14 +10,10 @@ def generate_env_args(stock_dimension):
     return env_args
 
 
-def PPO_agent(environment):
+def PPO_agent(environment, hyperparameters):
     from .PPO_method import PPOLearner
 
-    agent = PPOLearner(env=environment, policy=parameters.MODEL_PARAMS['policy'],
-                       learning_rate=parameters.MODEL_PARAMS['learning_rate'],
-                       ent_coef=parameters.MODEL_PARAMS['ent_coef'],
-                       tensorboard_log=f"{parameters.TENSORBOARD_LOG_DIR}/ppo",
-                       verbose=parameters.MODEL_PARAMS['verbose'])
+    agent = PPOLearner(env=environment, **hyperparameters)
     return agent
 
 
@@ -49,3 +45,20 @@ def dataframe2excel(dataframe, filename, date=None):
                            filename.format(parameters.TRAIN_START_DATE, parameters.TRAIN_END_DATE, _date))
 
 
+def create_agent_and_train(env_train, e_trade_gym):
+
+    if parameters.TUNE:
+        from ..tunning import create_study
+        hyperparameters = create_study(env_train, parameters.MODEL_PARAMS['total_timesteps'],
+                                       e_trade_gym, parameters.MODEL_PARAMS['policy'], parameters.N_TRIALS)
+    else:
+        hyperparameters = {'policy': parameters.MODEL_PARAMS['policy'],
+                           'learning_rate': parameters.MODEL_PARAMS['learning_rate'],
+                           'ent_coef': parameters.MODEL_PARAMS['ent_coef'],
+                           'tensorboard_log': f"{parameters.TENSORBOARD_LOG_DIR}/ppo",
+                           'verbose': parameters.MODEL_PARAMS['verbose']}
+
+    agent = PPO_agent(env_train, hyperparameters)
+    trained_agent = train_agent(agent)
+
+    return trained_agent

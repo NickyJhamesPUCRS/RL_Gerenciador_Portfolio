@@ -38,11 +38,9 @@ DEFAULT_DATA_COLUMNS = ["date", "tic", "close"]
 '''
 MODEL_PARAMS = {'policy': 'MlpPolicy',
                 'total_timesteps': 200000,
-                'total_timesteps_old': 100000,
                 "n_steps": 2048,
                 "ent_coef": 0.005,
                 "learning_rate": 0.0002,
-                "learning_rate_old": 0.0001,
                 "batch_size": 128,
                 'verbose': 1
                 }
@@ -128,3 +126,9 @@ B3_TICKER = [
 ########################### REFERENCE TICKER #############################
 '''
 REF_TICKER = "BOVA11.SA"
+
+'''
+########################### TUNE #############################
+'''
+TUNE = True
+N_TRIALS = 100
