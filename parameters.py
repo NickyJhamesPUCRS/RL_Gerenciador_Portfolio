@@ -24,10 +24,11 @@ TEST_START_DATE = '2020-10-02'
 TEST_END_DATE = '2021-10-02'
 '''
 
-TRAIN_START_DATE = '2017-01-01'
-TRAIN_END_DATE = '2017-12-31'
-TEST_START_DATE = '2018-01-30'
-TEST_END_DATE = '2018-06-30'
+TRAIN_START_DATE = '2016-01-01'
+TRAIN_END_DATE = '2020-12-31'
+
+TEST_START_DATE = '2021-01-01'
+TEST_END_DATE = '2021-10-30'
 
 START_TRADE_DATE = "2019-01-01"
 
@@ -36,6 +37,8 @@ DEFAULT_DATA_COLUMNS = ["date", "tic", "close"]
 '''
 ########################### MODEL PARAMS #############################
 '''
+'''
+original
 MODEL_PARAMS = {'policy': 'MlpPolicy',
                 'total_timesteps': 200000,
                 "n_steps": 2048,
@@ -43,6 +46,39 @@ MODEL_PARAMS = {'policy': 'MlpPolicy',
                 "learning_rate": 0.0002,
                 "batch_size": 128,
                 'verbose': 1
+                }
+'''
+'''
+[I 2021-12-03 01:19:01,222] Trial 9 finished with value: 0.14707928503337894 and parameters: 
+    {'batch_size': 32, 
+    'n_steps': 512, 
+    'gamma': 0.9999, 
+    'learning_rate': 0.0425204196357004, 
+    'ent_coef': 0.00019674620838047797, 
+    'clip_range': 0.2, 
+    'n_epochs': 20, 
+    'gae_lambda': 0.95, 
+    'max_grad_norm': 0.9, 
+    'vf_coef': 0.944765729882428, 
+    'net_arch': 'small', 
+    'activation_fn': 'tanh'}
+    . Best is trial 9 with value: 0.14707928503337894.
+'''
+MODEL_PARAMS = {'policy': 'MlpPolicy',
+                'total_timesteps': 200000,
+                'n_steps': 512, 
+                'gamma': 0.9999, 
+                'ent_coef': 0.00019674620838047797,
+                'learning_rate': 0.0425204196357004, 
+                'clip_range': 0.2, 
+                'batch_size': 32, 
+                'verbose': 1,
+                'n_epochs': 20, 
+                'gae_lambda': 0.95, 
+                'max_grad_norm': 0.9,
+                'vf_coef': 0.944765729882428, 
+                'net_arch': 'small', 
+                'activation_fn': 'tanh'
                 }
 
 '''
@@ -71,6 +107,7 @@ ENV_ARGS = {
         "tech_indicator_list": TECHNICAL_INDICATORS_LIST,
         "reward_scaling": 1e-4
     }
+
 
 '''
 ########################### TICKERS #############################
@@ -117,9 +154,8 @@ B3_TICKER = [
     "EQTL3.SA",
     "GGBR4.SA",
     "SANB11.SA",
-    "WEGE3.SA",
-    "IVVB11.SA"
-]
+    "WEGE3.SA"
+    ]
 
 
 '''
@@ -130,5 +166,10 @@ REF_TICKER = "BOVA11.SA"
 '''
 ########################### TUNE #############################
 '''
-TUNE = True
+TUNE = False
 N_TRIALS = 100
+
+'''
+[I 2021-12-02 22:21:40,532] Trial 2 finished with value: 0.1372766069087547 and parameters: {'batch_size': 128, 'n_steps': 512, 'gamma': 0.99, 'learning_rate': 0.00012898495377182658, 'ent_coef': 6.90331310095056e-08, 'clip_range': 0.2, 'n_epochs': 10, 'gae_lambda': 0.99, 'max_grad_norm': 1, 'vf_coef': 0.7616196153287176, 'net_arch': 'medium', 'activation_fn': 'relu'}. Best is trial 2 with value: 0.1372766069087547.
+[I 2021-12-03 01:19:01,222] Trial 9 finished with value: 0.14707928503337894 and parameters: {'batch_size': 32, 'n_steps': 512, 'gamma': 0.9999, 'learning_rate': 0.0425204196357004, 'ent_coef': 0.00019674620838047797, 'clip_range': 0.2, 'n_epochs': 20, 'gae_lambda': 0.95, 'max_grad_norm': 0.9, 'vf_coef': 0.944765729882428, 'net_arch': 'small', 'activation_fn': 'tanh'}. Best is trial 9 with value: 0.14707928503337894.
+'''
