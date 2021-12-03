@@ -17,9 +17,9 @@ def PPO_agent(environment, hyperparameters):
     return agent
 
 
-def train_agent(agent):
+def train_agent(agent, total_steps):
     from ..tensorboard_stuff import TensorboardCallback
-    agent.learn(total_timesteps=parameters.MODEL_PARAMS['total_timesteps'],
+    agent.learn(total_timesteps=total_steps,
                     tb_log_name="ppo",
                     callback=TensorboardCallback())
 
@@ -52,8 +52,9 @@ def create_agent_and_train(env_train, e_trade_gym):
         hyperparameters = create_study(env_train, parameters.MODEL_PARAMS['total_timesteps'],
                                        e_trade_gym, parameters.MODEL_PARAMS['policy'], parameters.N_TRIALS)
     else:
+        from ..tunning import load_net_archs
+
         hyperparameters = {'policy': parameters.MODEL_PARAMS['policy'],
-                            #'total_timesteps': parameters.MODEL_PARAMS['total_timesteps'],
                             'learning_rate': parameters.MODEL_PARAMS['learning_rate'],
                             'ent_coef': parameters.MODEL_PARAMS['ent_coef'],
                             'tensorboard_log': f"{parameters.TENSORBOARD_LOG_DIR}/ppo",
@@ -66,11 +67,13 @@ def create_agent_and_train(env_train, e_trade_gym):
                             'gae_lambda': parameters.MODEL_PARAMS['gae_lambda'],
                             'max_grad_norm': parameters.MODEL_PARAMS['max_grad_norm'],
                             'vf_coef': parameters.MODEL_PARAMS['vf_coef'],
-                            #'net_arch': parameters.MODEL_PARAMS['net_arch'],
-                            #'activation_fn': parameters.MODEL_PARAMS['activation_fn']
+                            'net_arch': parameters.MODEL_PARAMS['net_arch'],
+                            'activation_fn': parameters.MODEL_PARAMS['activation_fn']
                            }
 
+        hyperparameters = load_net_archs(hyperparameters)
+
     agent = PPO_agent(env_train, hyperparameters)
-    trained_agent = train_agent(agent)
+    trained_agent = train_agent(agent, parameters.MODEL_PARAMS['total_timesteps'])
 
     return trained_agent

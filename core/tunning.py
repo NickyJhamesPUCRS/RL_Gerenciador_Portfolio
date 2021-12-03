@@ -107,6 +107,14 @@ def calculate_sharpe(dataframe):
         return 0
 
 
+def load_net_archs(hyperparameters):
+    hyperparameters['net_arch'] = {"small": [dict(pi=[64, 64], vf=[64, 64])],
+                               "medium": [dict(pi=[256, 256], vf=[256, 256])]}[hyperparameters['net_arch']]
+    hyperparameters['activation_fn'] = {"tanh": nn.Tanh, "relu": nn.ReLU,
+                                    "elu": nn.ELU, "leaky_relu": nn.LeakyReLU}[hyperparameters['activation_fn']]
+    return hyperparameters
+
+
 def create_study(environment, timesteps, e_trade_gym, policy, n_trials):
 
     def trial_until_hits(trial: optuna.Trial):
@@ -134,12 +142,8 @@ def create_study(environment, timesteps, e_trade_gym, policy, n_trials):
 
     best_params = study.best_params
     best_params['policy'] = policy
-    best_params['net_arch'] = {"small": [dict(pi=[64, 64], vf=[64, 64])],
-                               "medium": [dict(pi=[256, 256], vf=[256, 256])]}[best_params['net_arch']]
-    best_params['activation_fn'] = {"tanh": nn.Tanh, "relu": nn.ReLU,
-                                    "elu": nn.ELU, "leaky_relu": nn.LeakyReLU}[best_params['activation_fn']]
 
-    return best_params
+    return load_net_archs(best_params)
 
 
 
