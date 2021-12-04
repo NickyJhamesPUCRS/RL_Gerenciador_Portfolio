@@ -65,7 +65,7 @@ MODEL_PARAMS = {'policy': 'MlpPolicy',
     . Best is trial 9 with value: 0.14707928503337894.
 '''
 MODEL_PARAMS = {'policy': 'MlpPolicy',
-                'total_timesteps': 200000,
+                'total_timesteps': 100000,
                 'n_steps': 512, 
                 'gamma': 0.9999, 
                 'ent_coef': 0.00019674620838047797,
@@ -166,8 +166,9 @@ REF_TICKER = "BOVA11.SA"
 '''
 ########################### TUNE #############################
 '''
-TUNE = False
+TUNE = True
 N_TRIALS = 100
+TUNE_TIMESTEPS = 5000
 
 '''
 [I 2021-12-02 22:21:40,532] Trial 2 finished with value: 0.1372766069087547 and parameters: {'batch_size': 128, 'n_steps': 512, 'gamma': 0.99, 'learning_rate': 0.00012898495377182658, 'ent_coef': 6.90331310095056e-08, 'clip_range': 0.2, 'n_epochs': 10, 'gae_lambda': 0.99, 'max_grad_norm': 1, 'vf_coef': 0.7616196153287176, 'net_arch': 'medium', 'activation_fn': 'relu'}. Best is trial 2 with value: 0.1372766069087547.

@@ -49,7 +49,7 @@ def create_agent_and_train(env_train, e_trade_gym):
 
     if parameters.TUNE:
         from ..tunning import create_study
-        hyperparameters = create_study(env_train, parameters.MODEL_PARAMS['total_timesteps'],
+        hyperparameters = create_study(env_train, parameters.TUNE_TIMESTEPS,
                                        e_trade_gym, parameters.MODEL_PARAMS['policy'], parameters.N_TRIALS)
     else:
         from ..tunning import load_net_archs
